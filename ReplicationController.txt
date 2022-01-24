@@ -1,0 +1,38 @@
+ReplicationController:
+A replication controller(RC) is supervisor for long-running pods.An RC will launch a specified number of pods called replicas and makes sure that they keep running
+Ensure that specified number of pods running at any time
+if any extra pods are running it will kill that pod and vice versa
+Now Pod get launch when they get fail, get deleted or terminated.
+
+Advantages of RC:
+1.HighAvailability
+2.LoadBalacing
+
+Replication Controller Manifest file
+Below are the segments needs to define in Replication Controller Manifestfile
+
+1.API Version
+2.MetaData
+3.Specification
+4.Template
+
+#ReplicationController.yml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: nginxreplication
+spec:
+  replicas: 3
+  selector:
+    app: nginx
+  template:
+    metadata:
+      name: nginx
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginximage
+        image: nginx
+        ports:
+        - containerPort: 80

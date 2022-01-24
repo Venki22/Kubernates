@@ -1,0 +1,28 @@
+node{
+    stage("Git clone"){
+    git credentialsId: 'GIT_HUB_CRE', url: 'https://github.com/Venki22/spring-boot-mongo-docker.git' 
+    }
+    
+    stage("Maven clean package"){
+        def mavenHome = tool name: "Maven 3.8.4", type: "maven"
+        def mavenCMD= "${mavenHome}/bin/mvn "
+        sh "${mavenCMD} clean package"
+    }
+    stage("Docker-hub image build"){
+        sh "docker build -t venki22/spring-boot-mongo ."
+    }
+    stage("Push Docker Image"){
+        withCredentials([string(credentialsId: 'DOCKER_HUB_PWD_DTL', variable: 'DOCKER_HUB_PWD_DTL')]) {
+        sh "docker login -u venki22 -p ${DOCKER_HUB_PWD_DTL}"
+        }
+        sh "docker push venki22/spring-boot-mongo"
+    }
+    stage("Kubernates deployment"){
+        kubernetesDeploy(
+        configs: 'springBootMongo-PrivateRepo.yml',
+        kubeconfigId: 'KUBERNATES_ID',
+        enableConfigSubstitution: true
+        ) 
+        
+    }
+}
